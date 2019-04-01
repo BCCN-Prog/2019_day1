@@ -31,10 +31,16 @@ def authenticate(username, password, pwdb):
 
 
 def add_user(username, password, pwdb):
-    salt = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-    hashed_password = hash_password(password + salt)
-    pwdb[username] = [hashed_password, salt]
-    write_pwdb(pwdb)
+    check = False
+    while check not in ['y', 'n']:
+        check = input("Do you want to add a user with these credentials? (y/n)")
+        if check == 'y':
+            salt = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+            hashed_password = hash_password(password + salt)
+            pwdb[username] = [hashed_password, salt]
+            write_pwdb(pwdb)
+        elif check == 'n':
+            print("ByeBye!")
 
 
 def read_pwdb():
