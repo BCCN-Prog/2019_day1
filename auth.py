@@ -1,14 +1,26 @@
 import pickle
+import string
+import random
+from getpass import getpass
+
+
+def hash_password(password):
+    hash_sum = 0
+    for letter in password:
+        hash_sum += ord(letter)
+    return hash_sum
+
 
 def get_credentials():
     username = input("Enter username:")
-    password = input("Enter password:")
+    password = getpass("Enter password:")
     return (username, password)
+
 
 def authenticate(username, password, pwdb):
     status = False
     if username in pwdb:
-        if password == pwdb[username]:
+        if hash_password(password + pwdb[username][1]) == pwdb[username][0]:
             status = True
         else:
             print('Wrong password!')
@@ -17,9 +29,13 @@ def authenticate(username, password, pwdb):
 
     return status
 
+
 def add_user(username, password, pwdb):
-    pwdb[username] = password
+    salt = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    hashed_password = hash_password(password + salt)
+    pwdb[username] = [hashed_password, salt]
     write_pwdb(pwdb)
+
 
 def read_pwdb():
     try:
@@ -29,6 +45,7 @@ def read_pwdb():
         pwdb = {}
 
     return pwdb
+
 
 def write_pwdb(pwdb):
     with open("pwdb.pkl", "wb") as fh:
