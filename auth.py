@@ -1,24 +1,41 @@
 import pickle
+import random
+import string
+from getpass import getpass
 
 def get_credentials():
     username = input("Enter username:")
-    password = input("Enter password:")
+    password = getpass("Enter password:")
     return (username, password)
+
+def password_hash(password, salt):
+    hash = 0
+    for i in password+salt:
+        hash += ord(i)
+    return hash
+
+def get_salt():
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+
 
 def authenticate(username, password, pwdb):
     status = False
     if username in pwdb:
-        if password == pwdb[username]:
+        salt = pwdb[username][0]
+        hash = password_hash(password,salt)
+        if hash == pwdb[username][1]:
             status = True
         else:
             print('Wrong password!')
     else:
-        add_user(username, password, pwdb)
+        salt = get_salt()
+        hash = password_hash(password,salt)
+        add_user(username, salt, hash, pwdb)
 
     return status
 
-def add_user(username, password, pwdb):
-    pwdb[username] = password
+def add_user(username, salt, hash, pwdb):
+    pwdb[username] = [salt, hash]
     write_pwdb(pwdb)
 
 def read_pwdb():
