@@ -18,15 +18,14 @@ def get_credentials():
 
 
 def authenticate(username, password, pwdb):
-    status = False
+    status = 0
     if username in pwdb:
         if hash_password(password + pwdb[username][1]) == pwdb[username][0]:
-            status = True
+            status = 1
         else:
             print('Wrong password!')
     else:
-        add_user(username, password, pwdb)
-
+        status = add_user(username, password, pwdb)
     return status
 
 
@@ -39,8 +38,12 @@ def add_user(username, password, pwdb):
             hashed_password = hash_password(password + salt)
             pwdb[username] = [hashed_password, salt]
             write_pwdb(pwdb)
+            status = 2
+            return status
         elif check == 'n':
             print("ByeBye!")
+            status = 0
+            return status
 
 
 def read_pwdb():
@@ -62,7 +65,9 @@ if __name__ == "__main__":
     username, password = get_credentials()
     pwdb = read_pwdb()
     status = authenticate(username, password, pwdb)
-    if status:
+    if status == 1:
         print('Authentication succeeded:', pwdb)
+    elif status == 2:
+        print('User created!')
     else:
         print('Authentication failed')
