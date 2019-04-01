@@ -1,8 +1,17 @@
 import pickle
 
+def salt(size=10, chars=string.ascii_letters + string.digits):
+    return "".join(random.choice(chars) for _ in range(size))
+
+def pwhash(password, salt):
+    hashedpw = 0
+    for char in password + salt:
+        hashedpw += ord(char)
+    return hashedpw
+
 def get_credentials():
     username = input("Enter username:")
-    password = input("Enter password:")
+    password = pwhash(getpass.getpass("Enter password:"))
     return (username, password)
 
 def authenticate(username, password, pwdb):
@@ -43,3 +52,6 @@ if __name__ == "__main__":
         print('Authentication succeeded:', pwdb)
     else:
         print('Authentication failed')
+string.ascii_letters
+
+
